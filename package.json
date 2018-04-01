@@ -4,7 +4,7 @@
   "description": "Tweets KDFC's playlist (kdfc.com/playlist/)",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/overwatchcorp/kdfc-playlist-bot/issues"
   },
-  "homepage": "https://github.com/overwatchcorp/kdfc-playlist-bot#readme"
+  "homepage": "https://github.com/overwatchcorp/kdfc-playlist-bot#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "node-fetch": "^2.1.2"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.10.0",
+    "jest": "^22.4.3"
+  }
 }
