@@ -378,7 +378,4 @@ module.exports = [ { title: 'Sinfonia Concertante in Bb Op 84 ',
         composer: 'Erik Satie ',
         performers: 'Valerie Milot, harp ',
         label: 'Analekta29986 ' },
-      { title: 'Song data not yet available for this segment.',
-        composer: '',
-        performers: undefined,
-        label: undefined } ];
+];

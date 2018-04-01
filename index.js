@@ -27,7 +27,7 @@ const index = {
         performers: songAttrLines[2],
         label: songAttrLines[3],
       };
-      songs.push(songAttrs)
+      if (songAttrs.title !== 'Song data not yet available for this segment.') songs.push(songAttrs);
     })
     return songs;
   },
