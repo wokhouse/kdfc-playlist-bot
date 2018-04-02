@@ -59,3 +59,4 @@ typings/
 
 .swp
 *.swp
+.env
