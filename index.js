@@ -2,4 +2,4 @@ require('dotenv').config();
 const kdfc = require('./src');
 
 kdfc.bot();
-setInterval(kdfc.bot, 30000);
+setInterval(kdfc.bot, 10000);
