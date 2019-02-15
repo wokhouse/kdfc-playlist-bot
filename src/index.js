@@ -42,13 +42,17 @@ const index = {
       const thisTimestamp = moment(thisTime, 'hh:mm a').valueOf();
       songs.push({ timestamp: thisTimestamp, songAttrs });
     });
+    console.log(`parsed ${songs.length} songs`);
     const sortedSongs = songs.sort((a,b) => (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0)); 
-    return sortedSongs[sortedSongs.length - 1].songAttrs;
+    const latestSong = sortedSongs[sortedSongs.length - 1].songAttrs;
+    const { title, composer, performers } = latestSong;
+    console.log(`latest songs is ${title} by ${composer} performed by ${performers}`);
+    return latestSong;
   },
   postLatestSong: (song) => {
     return new Promise((resolve, reject) => {
       const { title, composer, performers } = song;
-      const status = `${title}by ${composer}performed by ${performers}`;
+      const status = `${title} by ${composer} performed by ${performers}`;
       fs.readFile('latestsong.txt','utf8', (err, data) => {
         if (data !== status) {
           twitter.post('statuses/update', {status})

@@ -52,7 +52,7 @@ it('postLatestSong() should post tweet w/ song if song has not yet been tweeted'
     index.postLatestSong(songRef)
       .then((res) => {
         const { title, composer, performers } = songRef
-        const status = `${title}by ${composer}performed by ${performers}`;
+        const status = `${title} by ${composer} performed by ${performers}`;
         expect(res).toEqual(status)
         done();
     });
