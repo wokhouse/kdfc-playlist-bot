@@ -20,6 +20,7 @@ const index = {
     });
   },
   extractSong: async (domstring) => {
+    console.log('hhhh');
     const $ = cheerio.load(domstring);
     const rows = $('table tbody tr');
     const songs = [];
@@ -37,7 +38,7 @@ const index = {
         title: thisLinesTrimmed[0],
         composer: thisLinesTrimmed[1],
         performers: thisLinesTrimmed[2],
-        label: thisLinesTrimmed[3].replace(/([0-9\-]+)/, ' $1'),
+        label: (thisLinesTrimmed[3]) ? thisLinesTrimmed[3].replace(/([0-9\-]+)/, ' $1') : '',
       };
       const thisTimestamp = moment(thisTime, 'hh:mm a').valueOf();
       songs.push({ timestamp: thisTimestamp, songAttrs });
@@ -70,9 +71,9 @@ const index = {
     });
   },
   bot: () => {
-    const { getPlaylist, extractSongs, postLatestSong } = index;
+    const { getPlaylist, extractSong, postLatestSong } = index;
     getPlaylist()
-      .then(extractSongs)
+      .then(extractSong)
       .then(postLatestSong)
       .then(({text}) => console.log(`tweeted: ${text}`))
       .catch(console.error);
