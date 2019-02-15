@@ -20,7 +20,6 @@ const index = {
     });
   },
   extractSong: async (domstring) => {
-    console.log('hhhh');
     const $ = cheerio.load(domstring);
     const rows = $('table tbody tr');
     const songs = [];
