@@ -1,6 +1,6 @@
 const index = require('./index');
 const fs = require('fs');
-const songsRef = require('../bin/songsref.js');
+const songRef = require('../bin/songsref.js');
 
 // mock node-fetch
 const mockPlaylistDOM = fs.readFileSync('./bin/playlist-test.html', 'utf8');
@@ -40,19 +40,18 @@ it('getPlaylist() should return DOM of kdfc.com/playlist as string', (done) => {
       done();
     })
 });
-it('extractSongs() should return array of songs', (done) => {
-  index.extractSongs(mockPlaylistDOM)
-    .then((songs) => {
-      expect(songs).toEqual(songsRef);
+it('extractSong() should return latest soong', (done) => {
+  index.extractSong(mockPlaylistDOM)
+    .then((song) => {
+      expect(song).toEqual(songRef);
       done();
     });
 });
 it('postLatestSong() should post tweet w/ song if song has not yet been tweeted', (done) => {
   fs.unlink('latestsong.txt', () => {
-    index.postLatestSong(songsRef)
+    index.postLatestSong(songRef)
       .then((res) => {
-        const songs = songsRef;
-        const { title, composer, performers } = songs[songs.length - 1];
+        const { title, composer, performers } = songRef
         const status = `${title}by ${composer}performed by ${performers}`;
         expect(res).toEqual(status)
         done();
@@ -60,8 +59,8 @@ it('postLatestSong() should post tweet w/ song if song has not yet been tweeted'
   });
 });
 it('postLatestSong() should not post if song has already been tweeted', async (done) => {
-  await index.postLatestSong(songsRef)
-  await index.postLatestSong(songsRef)
+  await index.postLatestSong(songRef)
+  await index.postLatestSong(songRef)
     .then(async (res) => {
       expect(res).toEqual("song has already been posted");
       done();

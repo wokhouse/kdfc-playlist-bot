@@ -2,6 +2,7 @@ const fetch = require('node-fetch');
 const cheerio = require('cheerio');
 const Twitter = require('twitter');
 const fs = require('fs');
+const moment = require('moment');
 
 const twitter = new Twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -18,31 +19,35 @@ const index = {
         .then(body => resolve(body))
     });
   },
-  extractSongs: async (domstring) => {
+  extractSong: async (domstring) => {
     const $ = cheerio.load(domstring);
     const rows = $('table tbody tr');
-    const songs = []
-    rows.map((i) => {
-      const songAttrFields = cheerio.load(rows[i]);
-      const songAttrText = songAttrFields('td').text();
-      const songAttrLines = songAttrText.split('\n');
+    const songs = [];
+    const rowData = rows.map((i) => {
+      const thisRow = cheerio.load(rows[i]);
+      const thisText = thisRow('td').text();
+      const thisTime = thisRow('th').text();
+      const thisLines = thisText.split('\n');
       // remove empty line at beginning
-      songAttrLines.splice(0,1);
+      thisLines.splice(0,1);
       // remove 'Buy' and extra lines at end
-      songAttrLines.splice(4);
+      thisLines.splice(4);
+      const thisLinesTrimmed = thisLines.map(l => l.replace(/\s*$/,""));
       const songAttrs = {
-        title: songAttrLines[0],
-        composer: songAttrLines[1],
-        performers: songAttrLines[2],
-        label: songAttrLines[3],
+        title: thisLinesTrimmed[0],
+        composer: thisLinesTrimmed[1],
+        performers: thisLinesTrimmed[2],
+        label: thisLinesTrimmed[3].replace(/([0-9\-]+)/, ' $1'),
       };
-      if (songAttrs.title !== 'Song data not yet available for this segment.') songs.push(songAttrs);
-    })
-    return songs;
+      const thisTimestamp = moment(thisTime, 'hh:mm a').valueOf();
+      songs.push({ timestamp: thisTimestamp, songAttrs });
+    });
+    const sortedSongs = songs.sort((a,b) => (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0)); 
+    return sortedSongs[sortedSongs.length - 1].songAttrs;
   },
-  postLatestSong: (songs) => {
+  postLatestSong: (song) => {
     return new Promise((resolve, reject) => {
-      const { title, composer, performers } = songs[songs.length - 1];
+      const { title, composer, performers } = song;
       const status = `${title}by ${composer}performed by ${performers}`;
       fs.readFile('latestsong.txt','utf8', (err, data) => {
         if (data !== status) {

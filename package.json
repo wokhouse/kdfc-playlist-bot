@@ -7,6 +7,9 @@
     "start": "node index.js",
     "test": "jest --watch"
   },
+  "jest": {
+    "testURL": "http://localhost"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/overwatchcorp/kdfc-playlist-bot.git"
@@ -20,12 +23,13 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
     "dotenv": "^5.0.1",
-    "node-fetch": "^2.1.2",
+    "moment": "^2.24.0",
+    "node-fetch": "^2.3.0",
     "twitter": "^1.7.1"
   },
   "devDependencies": {
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.10.0",
-    "jest": "^22.4.3"
+    "eslint-plugin-import": "^2.16.0",
+    "jest": "^22.4.4"
   }
 }
