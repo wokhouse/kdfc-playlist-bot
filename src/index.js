@@ -74,7 +74,7 @@ const index = {
     getPlaylist()
       .then(extractSong)
       .then(postLatestSong)
-      .then(({text}) => console.log(`tweeted: ${text}`))
+      .then(({text}) => (text) ? console.log(`tweeted ${text}`) : undefined)
       .catch(console.error);
   },
 }
