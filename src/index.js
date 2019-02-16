@@ -39,8 +39,10 @@ const index = {
         performers: thisLinesTrimmed[2],
         label: (thisLinesTrimmed[3]) ? thisLinesTrimmed[3].replace(/([0-9\-]+)/, ' $1') : '',
       };
-      const thisTimestamp = moment(thisTime, 'hh:mm a').valueOf();
-      songs.push({ timestamp: thisTimestamp, songAttrs });
+      if (songAttrs.title.indexOf('Song data not yet available for this') === -1) {
+        const thisTimestamp = moment(thisTime, 'hh:mm a').valueOf();
+        songs.push({ timestamp: thisTimestamp, songAttrs });
+      }
     });
     console.log(`parsed ${songs.length} songs`);
     const sortedSongs = songs.sort((a,b) => (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0)); 
