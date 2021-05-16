@@ -21,15 +21,15 @@
   },
   "homepage": "https://github.com/overwatchcorp/kdfc-playlist-bot#readme",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.2",
+    "cheerio": "^1.0.0-rc.9",
     "dotenv": "^5.0.1",
-    "moment": "^2.24.0",
-    "node-fetch": "^2.3.0",
+    "moment": "^2.29.1",
+    "node-fetch": "^2.6.1",
     "twitter": "^1.7.1"
   },
   "devDependencies": {
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-import": "^2.23.2",
     "jest": "^22.4.4"
   }
 }
