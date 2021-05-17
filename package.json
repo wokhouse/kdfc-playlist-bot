@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/overwatchcorp/kdfc-playlist-bot#readme",
   "dependencies": {
+    "bunyan": "^1.8.15",
     "cheerio": "^1.0.0-rc.9",
     "dotenv": "^5.0.1",
     "moment": "^2.29.1",

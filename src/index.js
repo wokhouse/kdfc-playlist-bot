@@ -1,8 +1,6 @@
 const fetch = require('node-fetch');
-const cheerio = require('cheerio');
 const Twitter = require('twitter');
 const fs = require('fs');
-const moment = require('moment');
 
 const twitter = new Twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -17,19 +15,17 @@ const index = {
     return res;
   },
   formatSong: async (songObj) => {
-    const { title, artist, Composer, Conductor, Orchestra } = songObj.extraInfo
-    const titleString = `${title} by ${Composer || artist}`;
-    const performanceString = `performed by ${Orchestra} under ${Conductor}`;
-    const out = `${titleString}${(Orchestra.length > 0) ? ` ${performanceString}` : ''}`;
+    const out = songObj.summary
+      .replace(/\n/g, ' / ')
+      .replace(/\s\s+/g, ' ');
     console.log(out);
+    return out;
   },
   postLatestSong: (song) => {
     return new Promise((resolve, reject) => {
-      const { title, composer, performers } = song;
-      const status = `${title} by ${composer} performed by ${performers}`;
       fs.readFile('latestsong.txt','utf8', (err, data) => {
-        if (data !== status) {
-          twitter.post('statuses/update', {status})
+        if (data !== song) {
+          twitter.post('statuses/update', { status: song })
             .then((tweet) => {
               // write latest tweet to file so we can make sure we don't tweet same song twice
               fs.writeFile('latestsong.txt', status, () => {
@@ -47,8 +43,8 @@ const index = {
     const { getPlaying, formatSong, postLatestSong } = index;
     getPlaying()
       .then(formatSong)
-      // .then(postLatestSong)
-      // .then(({text}) => (text) ? console.log(`tweeted ${text}`) : undefined)
+      .then(postLatestSong)
+      .then(({text}) => (text) ? console.log(`tweeted ${text}`) : undefined)
       .catch(console.error);
   },
 }
