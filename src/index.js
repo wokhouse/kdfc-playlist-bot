@@ -1,8 +1,6 @@
 const fetch = require('node-fetch');
-const cheerio = require('cheerio');
 const Twitter = require('twitter');
 const fs = require('fs');
-const moment = require('moment');
 
 const twitter = new Twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -12,52 +10,22 @@ const twitter = new Twitter({
 });
 
 const index = {
-  getPlaylist: () => {
-    return new Promise((resolve, reject) => {
-      fetch('https://kdfc.com/playlist/')
-        .then(res => res.text())
-        .then(body => resolve(body))
-    });
+  getPlaying: async () => {
+    const res = await fetch('https://schedule.kdfc.com/now/KDFC.json').then(r => r.json());
+    return res;
   },
-  extractSong: async (domstring) => {
-    const $ = cheerio.load(domstring);
-    const rows = $('table tbody tr');
-    const songs = [];
-    const rowData = rows.map((i) => {
-      const thisRow = cheerio.load(rows[i]);
-      const thisText = thisRow('td').text();
-      const thisTime = thisRow('th').text();
-      const thisLines = thisText.split('\n');
-      // remove empty line at beginning
-      thisLines.splice(0,1);
-      // remove 'Buy' and extra lines at end
-      thisLines.splice(4);
-      const thisLinesTrimmed = thisLines.map(l => l.replace(/\s*$/,""));
-      const songAttrs = {
-        title: thisLinesTrimmed[0],
-        composer: thisLinesTrimmed[1],
-        performers: thisLinesTrimmed[2],
-        label: (thisLinesTrimmed[3]) ? thisLinesTrimmed[3].replace(/([0-9\-]+)/, ' $1') : '',
-      };
-      if (songAttrs.title.indexOf('Song data not yet available for this') === -1) {
-        const thisTimestamp = moment(thisTime, 'hh:mm a').valueOf();
-        songs.push({ timestamp: thisTimestamp, songAttrs });
-      }
-    });
-    console.log(`parsed ${songs.length} songs`);
-    const sortedSongs = songs.sort((a,b) => (a.timestamp > b.timestamp) ? 1 : ((b.timestamp > a.timestamp) ? -1 : 0)); 
-    const latestSong = sortedSongs[sortedSongs.length - 1].songAttrs;
-    const { title, composer, performers } = latestSong;
-    console.log(`latest songs is ${title} by ${composer} performed by ${performers}`);
-    return latestSong;
+  formatSong: async (songObj) => {
+    const out = songObj.summary
+      .replace(/\n/g, ' / ')
+      .replace(/\s\s+/g, ' ');
+    console.log(out);
+    return out;
   },
   postLatestSong: (song) => {
     return new Promise((resolve, reject) => {
-      const { title, composer, performers } = song;
-      const status = `${title} by ${composer} performed by ${performers}`;
       fs.readFile('latestsong.txt','utf8', (err, data) => {
-        if (data !== status) {
-          twitter.post('statuses/update', {status})
+        if (data !== song) {
+          twitter.post('statuses/update', { status: song })
             .then((tweet) => {
               // write latest tweet to file so we can make sure we don't tweet same song twice
               fs.writeFile('latestsong.txt', status, () => {
@@ -72,9 +40,9 @@ const index = {
     });
   },
   bot: () => {
-    const { getPlaylist, extractSong, postLatestSong } = index;
-    getPlaylist()
-      .then(extractSong)
+    const { getPlaying, formatSong, postLatestSong } = index;
+    getPlaying()
+      .then(formatSong)
       .then(postLatestSong)
       .then(({text}) => (text) ? console.log(`tweeted ${text}`) : undefined)
       .catch(console.error);
